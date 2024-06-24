@@ -75,10 +75,12 @@ def hello_all(message):
 @bot.message_handler(func= lambda message: message.text.lower() == 'рандомное фото')
 def random_photo(message):
     url = "https://api.unsplash.com/photos/random?client_id=9xz-KB27jFOshFEus5HvgWEed2NohcyFu_E-wNOO3fM"
-    response = requests.get(url)
+    params = {'count': '2'}
+    response = requests.get(url, params=params)
     data = response.json()
-    photo_url = data['urls']['regular']
-    bot.send_photo(message.chat.id, photo=photo_url)
+    photo1 = types.InputMediaPhoto(media=data[0]['urls']['regular'])
+    photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
+    bot.send_media_group(message.chat.id, [photo1, photo2])
     with open('logs.TXT', 'a') as logs:
         print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
 
@@ -108,10 +110,8 @@ def get_info(message):
         response = requests.get(url=f'https://api.telegram.org/bot{token}/getChat', params=params)
         data = response.json()
         bio = data['result']['bio']
-        print(bio)
     except:
         bio = 'Невозможно получить доступ к описанию профиля'
-        print(bio)
 
     try:
         params = {'user_id': str(message.chat.id)}
