@@ -2,8 +2,8 @@ from telebot import *
 from types import *
 import requests
 
-
-bot = TeleBot('7252009265:AAEScH2fMjOI1xQakbhJPM0MDDpkONzhaLs')
+token = '7252009265:AAEScH2fMjOI1xQakbhJPM0MDDpkONzhaLs'
+bot = TeleBot(token=token)
 
 
 @bot.message_handler(commands=['start'])
@@ -82,6 +82,7 @@ def random_photo(message):
     with open('logs.TXT', 'a') as logs:
         print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
 
+
 @bot.message_handler(func= lambda message: message.text.lower() == 'получить информацию обо мне')
 def get_info(message):
     first_name = message.from_user.first_name
@@ -101,7 +102,36 @@ def get_info(message):
         premium = 'нет'
     else:
         premium = 'да'
-    bot.send_message(message.chat.id, text=f'Ваше имя: {first_name} \nВаша фамилия: {last_name} \nВаш псевдоним: {nickname} \nПремиум: {premium}')
+
+    try:
+        params = {'chat_id': str(message.chat.id)}
+        response = requests.get(url=f'https://api.telegram.org/bot{token}/getChat', params=params)
+        data = response.json()
+        bio = data['result']['bio']
+        print(bio)
+    except:
+        bio = 'Невозможно получить доступ к описанию профиля'
+        print(bio)
+
+    try:
+        params = {'user_id': str(message.chat.id)}
+        response = requests.get(url=f'https://api.telegram.org/bot{token}/getUserProfilePhotos', params=params)
+        photo = response.json()
+        photo = photo['result']['photos']
+        photo = photo[0][-1]['file_id']
+        bot.send_photo(message.chat.id, photo=photo, caption=f'Ваше имя: {first_name} '
+                                                             f'\nВаша фамилия: {last_name} '
+                                                             f'\nВаш псевдоним: {nickname} '
+                                                             f'\nПремиум: {premium} '
+                                                             f'\nОписание: {bio}')
+    except:
+        bot.send_message(message.chat.id, text=f'Ваше имя: {first_name} '
+                                               f'\nВаша фамилия: {last_name} '
+                                               f'\nВаш псевдоним: {nickname} '
+                                               f'\nПремиум: {premium} '
+                                               f'\nФото: невозможно получить фото '
+                                               f'\nОписание: {bio}')
+
     with open('logs.TXT', 'a') as logs:
         print(f'Пользователь {message.from_user.first_name} написал "{message.text}'.encode('utf8'), file=logs, )
 
