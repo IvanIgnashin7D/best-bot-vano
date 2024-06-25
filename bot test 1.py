@@ -1,9 +1,16 @@
 from telebot import *
 from types import *
 import requests
+import logging
+from dotenv import load_dotenv
+import os
 
-token = '7252009265:AAEScH2fMjOI1xQakbhJPM0MDDpkONzhaLs'
+
+load_dotenv()
+UNSPLASH_API_KEY = os.getenv('CLIENT_ID')
+token = os.getenv('TOKEN')
 bot = TeleBot(token=token)
+logging.basicConfig(filename='logs.log', level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
 @bot.message_handler(commands=['start'])
@@ -26,9 +33,6 @@ def privet(message):
         file.write(user_id+' ')
     file.close()
     bot.send_message(message.chat.id, text=text, reply_markup=keyboard)
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
-        # print(f'Бот ответил: "{text}"', file=logs)
 
 
 @bot.message_handler(commands=['ssilki'])
@@ -39,8 +43,7 @@ def send_ssilki(message):
     button2 = types.InlineKeyboardButton(text='Telegram', url='https://ru.wikipedia.org/wiki/Telegram')
     keyboard.add(button1, button2)
     bot.send_message(message.chat.id, text='Вот кнопки с ссылками:', reply_markup=keyboard)
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
+    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил кнопки с ссылками.')
 
 
 @bot.message_handler(commands=['photo'])
@@ -48,16 +51,14 @@ def send_ssilki(message):
 def send_photo(message):
     photo = open('x_915201e5.jpg', 'rb')
     bot.send_photo(message.chat.id, photo, caption='Вот фото сверху')
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
+    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил фото с подписью.')
 
 
 @bot.message_handler(commands=['ssilka'])
 @bot.message_handler(func= lambda message: message.text == 'Отправить одну ссылку')
 def send_ssilka(message):
     bot.send_message(message.chat.id, text='Вот ссылка на гугл: https://www.google.ru/')
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
+    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил ссылку на гугл.')
 
 
 @bot.message_handler(func=lambda message: message.text.lower() == 'отправить всем привет')
@@ -66,24 +67,22 @@ def hello_all(message):
     for user in txt:
         try:
             bot.send_message(user, text='Привет всем')
+            logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот всем написал привет.')
         except:
-            pass
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
+            logging.error(f'Пользователь {message.from_user.first_name} написал: {message.text}. ОШИБКА при отправке ответа.')
 
 
 @bot.message_handler(func= lambda message: message.text.lower() == 'рандомное фото')
 def random_photo(message):
-    url = "https://api.unsplash.com/photos/random?client_id=9xz-KB27jFOshFEus5HvgWEed2NohcyFu_E-wNOO3fM"
-    params = {'count': '2'}
+    url = f"https://api.unsplash.com/photos/random?client_id={UNSPLASH_API_KEY}"
+    params = {'count': '3'}
     response = requests.get(url, params=params)
     data = response.json()
     photo1 = types.InputMediaPhoto(media=data[0]['urls']['regular'])
     photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
-    bot.send_media_group(message.chat.id, [photo1, photo2])
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}', file=logs)
-
+    photo3 = types.InputMediaPhoto(media=data[2]['urls']['regular'])
+    bot.send_media_group(message.chat.id, [photo1, photo2, photo3])
+    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил 3 фото.')
 
 @bot.message_handler(func= lambda message: message.text.lower() == 'получить информацию обо мне')
 def get_info(message):
@@ -91,13 +90,6 @@ def get_info(message):
     last_name = message.from_user.last_name
     nickname = message.from_user.username
     premium = message.from_user.is_premium
-    file = open('users_full.TXT', 'r')
-    txt = file.read()
-    if str(message.chat.id) not in txt:
-        file.close()
-        file = open('users_full.TXT', 'a')
-        file.write(f'ID - {message.chat.id}\nFirst name - {first_name}\nLast name - {last_name}\nNickname - {nickname}\nPremium - {premium} \n\n')
-        file.close()
     if last_name is None:
         last_name = 'отсутсвует'
     if premium is None:
@@ -124,6 +116,7 @@ def get_info(message):
                                                              f'\nВаш псевдоним: {nickname} '
                                                              f'\nПремиум: {premium} '
                                                              f'\nОписание: {bio}')
+        logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил инфо и фото пользователя.')
     except:
         bot.send_message(message.chat.id, text=f'Ваше имя: {first_name} '
                                                f'\nВаша фамилия: {last_name} '
@@ -131,9 +124,7 @@ def get_info(message):
                                                f'\nПремиум: {premium} '
                                                f'\nФото: невозможно получить фото '
                                                f'\nОписание: {bio}')
-
-    with open('logs.TXT', 'a') as logs:
-        print(f'Пользователь {message.from_user.first_name} написал "{message.text}'.encode('utf8'), file=logs, )
+        logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил инфо пользователя без фото.')
 
 
 bot.polling()
