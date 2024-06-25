@@ -72,17 +72,26 @@ def hello_all(message):
             logging.error(f'Пользователь {message.from_user.first_name} написал: {message.text}. ОШИБКА при отправке ответа.')
 
 
-@bot.message_handler(func= lambda message: message.text.lower() == 'рандомное фото')
-def random_photo(message):
+@bot.message_handler(func=lambda message: message.text.lower() == 'рандомное фото')
+def random_photo_ask(message):
+    sent = bot.send_message(message.chat.id, text='Напишите тему фотографии ОДНИМ словом')
+    bot.register_next_step_handler(sent, random_photo_answer)
+
+def random_photo_answer(message):
     url = f"https://api.unsplash.com/photos/random?client_id={UNSPLASH_API_KEY}"
-    params = {'count': '3'}
+    params = {'count': '3', 'query': message.text}
     response = requests.get(url, params=params)
-    data = response.json()
-    photo1 = types.InputMediaPhoto(media=data[0]['urls']['regular'])
-    photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
-    photo3 = types.InputMediaPhoto(media=data[2]['urls']['regular'])
-    bot.send_media_group(message.chat.id, [photo1, photo2, photo3])
-    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил 3 фото.')
+    if response.status_code == 200:
+        data = response.json()
+        photo1 = types.InputMediaPhoto(media=data[0]['urls']['regular'])
+        photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
+        photo3 = types.InputMediaPhoto(media=data[2]['urls']['regular'])
+        bot.send_media_group(message.chat.id, [photo1, photo2, photo3])
+        logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил 3 фото.')
+    else:
+        bot.send_message(message.chat.id, text='Произошла ошибка при отправке фото( '
+                                               '\nВведите другую тему или повторите попытку позже.')
+        logging.error(f'ОШИБКА при отправке фото. КОД ОТВЕТА {response.status_code}')
 
 @bot.message_handler(func= lambda message: message.text.lower() == 'получить информацию обо мне')
 def get_info(message):
