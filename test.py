@@ -1,3 +1,6 @@
-with open('test.TXT', 'a') as txt:
-    for i in range(1, 6):
-        print(i, file=txt)
+from googletrans import Translator
+
+translator = Translator()
+txt = 'поезда'
+translated = translator.translate(txt, src='ru')
+print(translated.text)

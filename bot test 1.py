@@ -4,6 +4,7 @@ import requests
 import logging
 from dotenv import load_dotenv
 import os
+from googletrans import Translator
 
 
 load_dotenv()
@@ -11,18 +12,22 @@ UNSPLASH_API_KEY = os.getenv('CLIENT_ID')
 token = os.getenv('TOKEN')
 bot = TeleBot(token=token)
 logging.basicConfig(filename='logs.log', level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+translator = Translator()
+
+keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+button1 = types.KeyboardButton(text='Написать сообщение с ссылками')
+button2 = types.KeyboardButton(text='Отправить фото с подписью')
+button3 = types.KeyboardButton(text='Отправить одну ссылку')
+button4 = types.KeyboardButton(text='Отправить всем привет')
+button5 = types.KeyboardButton(text='Рандомное фото')
+button6 = types.KeyboardButton(text='Получить информацию обо мне')
+keyboard.add(button1, button2, button3, button4, button5, button6)
+
 
 
 @bot.message_handler(commands=['start'])
 def privet(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-    button1 = types.KeyboardButton(text='Написать сообщение с ссылками')
-    button2 = types.KeyboardButton(text='Отправить фото с подписью')
-    button3 = types.KeyboardButton(text='Отправить одну ссылку')
-    button4 = types.KeyboardButton(text='Отправить всем привет')
-    button5 = types.KeyboardButton(text='Рандомное фото')
-    button6 = types.KeyboardButton(text='Получить информацию обо мне')
-    keyboard.add(button1, button2, button3, button4, button5, button6)
+    global keyboard
     text = 'Привет, я бот'
     user_id = str(message.chat.id)
     file = open('users.TXT', 'r')
@@ -78,8 +83,10 @@ def random_photo_ask(message):
     bot.register_next_step_handler(sent, random_photo_answer)
 
 def random_photo_answer(message):
+    global keyboard
+    translated_text = translator.translate(message.text).text
     url = f"https://api.unsplash.com/photos/random?client_id={UNSPLASH_API_KEY}"
-    params = {'count': '3', 'query': message.text}
+    params = {'count': '3', 'query': translated_text}
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
@@ -87,11 +94,13 @@ def random_photo_answer(message):
         photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
         photo3 = types.InputMediaPhoto(media=data[2]['urls']['regular'])
         bot.send_media_group(message.chat.id, [photo1, photo2, photo3])
+        bot.send_message(message.chat.id, text='Выберите действие:', reply_markup=keyboard)
         logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил 3 фото.')
     else:
         bot.send_message(message.chat.id, text='Произошла ошибка при отправке фото( '
                                                '\nВведите другую тему или повторите попытку позже.')
         logging.error(f'ОШИБКА при отправке фото. КОД ОТВЕТА {response.status_code}')
+
 
 @bot.message_handler(func= lambda message: message.text.lower() == 'получить информацию обо мне')
 def get_info(message):
