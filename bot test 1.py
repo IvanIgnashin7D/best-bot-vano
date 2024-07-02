@@ -13,6 +13,7 @@ token = os.getenv('TOKEN')
 bot = TeleBot(token=token)
 logging.basicConfig(filename='logs.log', level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 translator = Translator()
+photo_info = {}
 
 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
 button1 = types.KeyboardButton(text='Написать сообщение с ссылками')
@@ -78,27 +79,30 @@ def hello_all(message):
 
 
 @bot.message_handler(func=lambda message: message.text.lower() == 'рандомное фото')
-def random_photo_ask(message):
+def random_photo_ask_query(message):
     sent = bot.send_message(message.chat.id, text='Напишите тему фотографии ОДНИМ словом')
+    bot.register_next_step_handler(sent, random_photo_ask_count)
+
+def random_photo_ask_count(message):
+    photo_info['query'] = message.text
+    sent = bot.send_message(message.chat.id, text='Напишите цифрой сколько изображений вы хотите? (не более 10)')
     bot.register_next_step_handler(sent, random_photo_answer)
 
 def random_photo_answer(message):
     global keyboard
-    translated_text = translator.translate(message.text).text
+    translated_text = translator.translate(photo_info['query']).text
     url = f"https://api.unsplash.com/photos/random?client_id={UNSPLASH_API_KEY}"
-    params = {'count': '3', 'query': translated_text}
+    params = {'count': message.text, 'query': translated_text}
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
-        photo1 = types.InputMediaPhoto(media=data[0]['urls']['regular'])
-        photo2 = types.InputMediaPhoto(media=data[1]['urls']['regular'])
-        photo3 = types.InputMediaPhoto(media=data[2]['urls']['regular'])
-        bot.send_media_group(message.chat.id, [photo1, photo2, photo3])
+        photos = [types.InputMediaPhoto(media=data[i]['urls']['regular']) for i in range(int(message.text))]
+        bot.send_media_group(message.chat.id, media=photos)
         bot.send_message(message.chat.id, text='Выберите действие:', reply_markup=keyboard)
         logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил 3 фото.')
     else:
         bot.send_message(message.chat.id, text='Произошла ошибка при отправке фото( '
-                                               '\nВведите другую тему или повторите попытку позже.')
+                                               '\nВведите другую тему или повторите попытку позже.', reply_markup=keyboard)
         logging.error(f'ОШИБКА при отправке фото. КОД ОТВЕТА {response.status_code}')
 
 
