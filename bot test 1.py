@@ -5,6 +5,7 @@ import logging
 from dotenv import load_dotenv
 import os
 from googletrans import Translator
+from time import sleep
 
 
 load_dotenv()
@@ -149,4 +150,10 @@ def get_info(message):
         logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил инфо пользователя без фото.')
 
 
-bot.polling()
+while True:
+    try:
+        bot.polling()
+    except:
+        logging.critical("КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА")
+        sleep(60)
+        continue
