@@ -1,3 +1,85 @@
 2024-07-02 16:03:14,352 INFO Пользователь Ivashka Iz Prostokvashki написал: 1. Бот отправил 3 фото.
 2024-07-02 16:03:18,480 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
 2024-07-02 16:03:20,733 INFO Пользователь Ivashka Iz Prostokvashki написал: Получить информацию обо мне. Бот отправил инфо и фото пользователя.
+2024-07-02 23:25:53,448 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
+2024-07-02 23:25:57,155 INFO Пользователь Ivashka Iz Prostokvashki написал: Отправить фото с подписью. Бот отправил фото с подписью.
+2024-07-02 23:26:00,832 INFO Пользователь Ivashka Iz Prostokvashki написал: Отправить одну ссылку. Бот отправил ссылку на гугл.
+2024-07-02 23:26:10,537 INFO Пользователь Ivashka Iz Prostokvashki написал: Получить информацию обо мне. Бот отправил инфо и фото пользователя.
+2024-07-02 23:26:34,747 INFO Пользователь Ivashka Iz Prostokvashki написал: 4. Бот отправил 3 фото.
+2024-07-02 23:37:33,180 ERROR Threaded polling exception: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message text is empty
+2024-07-02 23:37:33,181 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 1215, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\util.py", line 150, in raise_exceptions
+    raise self.exception_info
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\util.py", line 93, in run
+    task(*args, **kwargs)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 8573, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Проекты\bots 2\best-bot-vano\bot test 1.py", line 80, in send_users_information
+    bot.send_message(message.chat.id, text=text)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 1755, in send_message
+    apihelper.send_message(
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 273, in send_message
+    return _make_request(token, method_url, params=payload, method='post')
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 168, in _make_request
+    json_result = _check_result(method_name, result)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 195, in _check_result
+    raise ApiTelegramException(method_name, result, result_json)
+telebot.apihelper.ApiTelegramException: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message text is empty
+
+2024-07-02 23:39:33,128 ERROR Threaded polling exception: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message text is empty
+2024-07-02 23:39:33,128 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 1215, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\util.py", line 150, in raise_exceptions
+    raise self.exception_info
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\util.py", line 93, in run
+    task(*args, **kwargs)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 8573, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Проекты\bots 2\best-bot-vano\bot test 1.py", line 80, in send_users_information
+    bot.send_message(message.chat.id, text=text)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\__init__.py", line 1755, in send_message
+    apihelper.send_message(
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 273, in send_message
+    return _make_request(token, method_url, params=payload, method='post')
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 168, in _make_request
+    json_result = _check_result(method_name, result)
+  File "C:\Проекты\bots 2\venv\lib\site-packages\telebot\apihelper.py", line 195, in _check_result
+    raise ApiTelegramException(method_name, result, result_json)
+telebot.apihelper.ApiTelegramException: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message text is empty
+
+2024-07-02 23:54:14,239 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:56:36,918 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:57:48,016 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:58:44,809 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:59:05,835 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:59:21,262 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:59:32,407 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-02 23:59:45,642 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:03,921 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:09,265 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:23,736 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:39,404 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:50,872 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:00:56,473 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:03:54,257 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:04:05,275 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:04:12,386 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:04:59,430 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:05:06,694 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:05:13,703 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
+2024-07-03 00:05:59,015 INFO Пользователь Ivashka Iz Prostokvashki написал: Отправить одну ссылку. Бот отправил ссылку на гугл.
+2024-07-03 00:05:59,038 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
+2024-07-03 00:05:59,344 INFO Пользователь Ivashka Iz Prostokvashki написал: Получить информацию обо мне. Бот отправил инфо и фото пользователя.
+2024-07-03 00:06:04,792 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
+2024-07-03 00:06:06,329 INFO Пользователь Ivashka Iz Prostokvashki написал: Отправить одну ссылку. Бот отправил ссылку на гугл.
+2024-07-03 00:06:13,199 INFO Пользователь Ivashka Iz Prostokvashki написал: 1. Бот отправил 3 фото.
+2024-07-03 00:06:16,619 INFO Пользователь Ivashka Iz Prostokvashki написал: Получить информацию обо мне. Бот отправил инфо и фото пользователя.
+2024-07-03 00:06:19,685 INFO Пользователь Ivashka Iz Prostokvashki написал: Написать сообщение с ссылками. Бот отправил кнопки с ссылками.
+2024-07-03 00:06:26,152 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:07:22,852 CRITICAL КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА
+2024-07-03 00:17:04,717 INFO Пользователь Ivashka Iz Prostokvashki написал: Отправить всем привет. Бот всем написал привет.

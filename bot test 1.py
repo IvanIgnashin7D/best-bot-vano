@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from googletrans import Translator
 from time import sleep
+import sqlite3
 
 
 load_dotenv()
@@ -18,7 +19,7 @@ photo_info = {}
 
 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
 button1 = types.KeyboardButton(text='Написать сообщение с ссылками')
-button2 = types.KeyboardButton(text='Отправить фото с подписью')
+button2 = types.KeyboardButton(text='Получить список пользователей')
 button3 = types.KeyboardButton(text='Отправить одну ссылку')
 button4 = types.KeyboardButton(text='Отправить всем привет')
 button5 = types.KeyboardButton(text='Рандомное фото')
@@ -26,24 +27,44 @@ button6 = types.KeyboardButton(text='Получить информацию об�
 keyboard.add(button1, button2, button3, button4, button5, button6)
 
 
+conn = sqlite3.connect('baza.sql')
+cur = conn.cursor()
+cur.execute('CREATE TABLE IF NOT EXISTS users (id int primary key, name TEXT)')
+conn.commit()
+cur.close()
+conn.close()
+
 
 @bot.message_handler(commands=['start'])
 def privet(message):
     global keyboard
     text = 'Привет, я бот'
-    user_id = str(message.chat.id)
-    file = open('users.TXT', 'r')
-    txt = file.read().split(' ')
-    file.close()
-    file = open('users.TXT', 'a')
-    if user_id not in txt:
-        file.write(user_id+' ')
-    file.close()
+    conn = sqlite3.connect('baza.sql')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    conn = sqlite3.connect('baza.sql')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM USERS')
+    users = cur.fetchall()
+    flag = True
+    for i in users:
+        if i[0] == message.chat.id:
+            flag = False
+            break
+    if flag:
+        cur.execute('INSERT INTO users (id, name) VALUES (?, ?)', (message.chat.id, message.from_user.first_name))
+        conn.commit()
+    cur.close()
+    conn.close()
     bot.send_message(message.chat.id, text=text, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['ssilki'])
-@bot.message_handler(func= lambda message: message.text == 'Написать сообщение с ссылками')
+@bot.message_handler(func=lambda message: message.text == 'Написать сообщение с ссылками')
 def send_ssilki(message):
     keyboard = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton(text='Vikipedia', url='https://ru.wikipedia.org/wiki/%D0%92%D0%B8%D0%BA%D0%B8%D0%BF%D0%B5%D0%B4%D0%B8%D1%8F')
@@ -53,12 +74,17 @@ def send_ssilki(message):
     logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил кнопки с ссылками.')
 
 
-@bot.message_handler(commands=['photo'])
-@bot.message_handler(func= lambda message: message.text == 'Отправить фото с подписью')
-def send_photo(message):
-    photo = open('x_915201e5.jpg', 'rb')
-    bot.send_photo(message.chat.id, photo, caption='Вот фото сверху')
-    logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот отправил фото с подписью.')
+@bot.message_handler(commands=['users'])
+@bot.message_handler(func=lambda message: message.text == 'Получить список пользователей')
+def send_users_information(message):
+    text = 'Вот список пользователей: \n'
+    conn = sqlite3.connect('baza.sql')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    for i in users:
+        text += f'ID: {i[0]}; Имя: {i[1]} \n'
+    bot.send_message(message.chat.id, text=text)
 
 
 @bot.message_handler(commands=['ssilka'])
@@ -70,10 +96,15 @@ def send_ssilka(message):
 
 @bot.message_handler(func=lambda message: message.text.lower() == 'отправить всем привет')
 def hello_all(message):
-    txt = open('users.TXT', 'r').read().split(' ')
-    for user in txt:
+    conn = sqlite3.connect('baza.sql')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    cur.close()
+    conn.close()
+    for user in users:
         try:
-            bot.send_message(user, text='Привет всем')
+            bot.send_message(user[0], text=f'Привет, {user[1]}')
             logging.info(f'Пользователь {message.from_user.first_name} написал: {message.text}. Бот всем написал привет.')
         except:
             logging.error(f'Пользователь {message.from_user.first_name} написал: {message.text}. ОШИБКА при отправке ответа.')
@@ -155,5 +186,6 @@ while True:
         bot.polling()
     except:
         logging.critical("КРИТИЧЕСКАЯ ОШИБКА В РАБОТЕ БОТА")
+        print('ОШИБКА')
         sleep(60)
         continue
